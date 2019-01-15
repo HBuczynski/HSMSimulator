@@ -18,13 +18,14 @@ namespace hsm
     protected:
         void defineNextState(const std::string &name) noexcept;
 
+        TransitionTable transitionTable_;
+
     private:
         void stateTransition(std::shared_ptr<State> state) noexcept;
         void tracePathToTarget();
         uint16_t leastCommonAncestor(std::shared_ptr<State> state);
         void exitToLCA(uint16_t toLCA);
 
-        TransitionTable transitionTable_;
         std::shared_ptr<State> nextState_;
 
         const std::string NAME;

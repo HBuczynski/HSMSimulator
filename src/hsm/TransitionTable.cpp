@@ -10,10 +10,13 @@ TransitionTable::TransitionTable(initializer_list<TranasitionElement> statesTabl
 {
     for(auto &element : statesTable)
     {
+        assert((get<0>(element)->getParent() != nullptr) && "You dont' initialized parent state.");
+        assert((get<2>(element)->getParent() != nullptr) && "You dont' initialized parent state.");
+
         get<0>(element)->addTransition(get<1>(element), get<2>(element));
 
-        addNewState(get<0>(element));
-        addNewState(get<2>(element));
+        addNotBindState(get<0>(element));
+        addNotBindState(get<2>(element));
         addNewEvent(get<1>(element));
 
         transitionVector_.push_back(move(element));
@@ -41,7 +44,7 @@ string TransitionTable::showTable() const noexcept
     return log.str();
 }
 
-void TransitionTable::addNewState(shared_ptr<State> state)
+void TransitionTable::addNotBindState(shared_ptr<State> state)
 {
     const auto isRegistered = states_.find(state->getName());
 

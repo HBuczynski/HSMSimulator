@@ -17,11 +17,13 @@ namespace hsm
         const std::vector<TranasitionElement> &getTransitionTable() const noexcept;
         std::string showTable() const noexcept;
 
+        void addNotBindState(std::shared_ptr<State> state);
+
         std::shared_ptr<State> getState(std::string id);
         Event getEvent(std::string key);
 
     private:
-        void addNewState(std::shared_ptr<State> state);
+
         void addNewEvent(Event event);
 
         std::unordered_map<std::string, std::shared_ptr<State> > states_;
