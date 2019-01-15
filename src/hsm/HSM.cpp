@@ -1,6 +1,7 @@
 #include "HSM.h"
 #include <vector>
 #include <cassert>
+#include <algorithm>
 
 using namespace std;
 using namespace hsm;
@@ -60,9 +61,9 @@ void HSM::tracePathToTarget()
         path.push_back(pathElement);
     }
 
-    for(auto &pathNode : path)
+    for(auto iter = path.rbegin(); iter != path.rend(); ++iter)
     {
-        pathNode->runEntryEvent();
+        (*iter)->runEntryEvent();
     }
 
     currentState_ = nextState_;
