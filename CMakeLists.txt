@@ -29,6 +29,7 @@ if((${TARGET_APP} STREQUAL HSMExample))
     add_subdirectory("src/example"                                              example                 )
 elseif(${TARGET_APP} STREQUAL AlexaSim)
     add_subdirectory("src/alexa_sim"                                            alexa_sim               )
+    add_subdirectory("src/message_queue_wrapper"                                message_queue_wrapper   )
 endif()
 
 #########################################################################################################
