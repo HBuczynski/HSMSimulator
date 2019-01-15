@@ -99,7 +99,7 @@ void State::runExitEvent() const noexcept
     {
         if(logger_.isErrorEnable())
         {
-            const std::string message = "State:: " + name_ + " - entry function is not defined.";
+            const std::string message = "State:: " + name_ + " - exit function is not defined.";
             logger_.writeLog(LogType::ERROR_LOG, message);
         }
     }
@@ -115,7 +115,7 @@ void State::runInitEvent() const noexcept
     {
         if(logger_.isErrorEnable())
         {
-            const std::string message = "State:: " + name_ + " - entry function is not defined.";
+            const std::string message = "State:: " + name_ + " - init function is not defined.";
             logger_.writeLog(LogType::ERROR_LOG, message);
         }
     }

@@ -18,7 +18,6 @@ namespace hsm
     public:
         State() = delete;
         State(const std::string &name, std::shared_ptr<State> parent = nullptr);
-        ~State() = default;
 
         void addTransition(Event event, std::shared_ptr<State> state);
         std::shared_ptr<State> moveToState(Event event);
