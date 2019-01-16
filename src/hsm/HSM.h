@@ -16,7 +16,7 @@ namespace hsm
         void handleEvent(Event event) noexcept;
 
     protected:
-        void defineNextState(const std::string &name) noexcept;
+        void defineInternalState(const std::string &name) noexcept;
 
         TransitionTable transitionTable_;
 

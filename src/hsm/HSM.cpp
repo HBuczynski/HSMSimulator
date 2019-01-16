@@ -56,21 +56,24 @@ void HSM::tracePathToTarget()
 {
     vector<shared_ptr<State>> path;
 
-    for(auto pathElement = nextState_; pathElement != currentState_; pathElement = pathElement->getParent())
+    if(nextState_->getParent())
     {
-        path.push_back(pathElement);
-    }
+        for (auto pathElement = nextState_; pathElement != currentState_; pathElement = pathElement->getParent())
+        {
+            path.push_back(pathElement);
+        }
 
-    for(auto iter = path.rbegin(); iter != path.rend(); ++iter)
-    {
-        (*iter)->runEntryEvent();
+        for (auto iter = path.rbegin(); iter != path.rend(); ++iter)
+        {
+            (*iter)->runEntryEvent();
+        }
     }
 
     currentState_ = nextState_;
     nextState_ = nullptr;
 }
 
-void HSM::defineNextState(const string &name) noexcept
+void HSM::defineInternalState(const string &name) noexcept
 {
     nextState_ = transitionTable_.getState(name);
 }

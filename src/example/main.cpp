@@ -94,10 +94,10 @@ int main()
 /* Run Hierarchical State Machine */
     example.start(); cout << endl;
 
-    example.handleEvent(transitionTable.getEvent("A_EVENT")); cout << endl;
-    example.handleEvent(transitionTable.getEvent("B_EVENT")); cout << endl;
-    example.handleEvent(transitionTable.getEvent("D_EVENT")); cout << endl;
-    example.handleEvent(transitionTable.getEvent("E_EVENT")); cout << endl;
+    example.handleEvent(transitionTable.getEvent("G_EVENT")); cout << endl;
+//    example.handleEvent(transitionTable.getEvent("B_EVENT")); cout << endl;
+//    example.handleEvent(transitionTable.getEvent("D_EVENT")); cout << endl;
+//    example.handleEvent(transitionTable.getEvent("E_EVENT")); cout << endl;
 
 /* END */
 

@@ -10,9 +10,6 @@ TransitionTable::TransitionTable(initializer_list<TranasitionElement> statesTabl
 {
     for(auto &element : statesTable)
     {
-        assert((get<0>(element)->getParent() != nullptr) && "You dont' initialized parent state.");
-        assert((get<2>(element)->getParent() != nullptr) && "You dont' initialized parent state.");
-
         get<0>(element)->addTransition(get<1>(element), get<2>(element));
 
         addNotBindState(get<0>(element));
@@ -37,8 +34,8 @@ string TransitionTable::showTable() const noexcept
     for(const auto& transition : transitionVector_)
     {
         log << to_string(counter++) << ".\t" << get<0>(transition)->getName() << "\t-->\t"
-                                            << get<1>(transition) << "\t-->\t"
-                                            << get<2>(transition)->getName() << "\n";
+                                             << get<1>(transition) << "\t-->\t"
+                                             << get<2>(transition)->getName() << "\n";
     }
 
     return log.str();

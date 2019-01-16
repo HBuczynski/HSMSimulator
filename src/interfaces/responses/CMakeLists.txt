@@ -1,9 +1,9 @@
 # Specify the minimum version of cmake.
 cmake_minimum_required(VERSION 3.0)
 
-project(wireless_responses)
+project(responses)
 
-set(PROJECT_NAME wireless_responses)
+set(PROJECT_NAME responses)
 include_directories("../")
 
 file(GLOB source_list "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")

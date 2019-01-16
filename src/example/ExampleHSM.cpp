@@ -10,44 +10,44 @@ ExampleHSM::ExampleHSM(const std::string &name, const hsm::TransitionTable &tran
 
 void ExampleHSM::initTop(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
     defineNextState("s1");
 }
 
 void ExampleHSM::inits1(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
     defineNextState("s11");
 }
 
 void ExampleHSM::inits11(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
 }
 
 void ExampleHSM::inits2(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
     defineNextState("s21");
 }
 
 void ExampleHSM::inits21(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
     defineNextState("s211");
 }
 
 void ExampleHSM::init211(const string &name) noexcept
 {
-    cout << "Init:" <<  name << " --> ";
+    cout << "Init:" <<  name << "  ";
 }
 
 void ExampleHSM::entryStateFunction(const string &name) noexcept
 {
-    cout << "Enter:" << name << " --> ";
+    cout << "Enter:" << name << "  ";
 }
 
 void ExampleHSM::exitStateFunction(const string &name) noexcept
 {
-    cout << "Exit:" << name << " --> ";
+    cout << "Exit:" << name << "  ";
 }
