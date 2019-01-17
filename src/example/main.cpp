@@ -1,9 +1,16 @@
 #include <logger/Logger.h>
 
+#include "S1State.h"
+#include "S2State.h"
+#include "S21State.h"
+#include "S11State.h"
+#include "TopState.h"
+#include "S211State.h"
 #include "ExampleHSM.h"
 
 using namespace hsm;
 using namespace std;
+using namespace example;
 using namespace utility;
 
 int main()
@@ -27,12 +34,12 @@ int main()
     }
 
 /* Define states */
-    auto top = make_shared<State>("top");
-    auto s1 = make_shared<State>("s1", top);
-    auto s11 = make_shared<State>("s11", s1);
-    auto s2 = make_shared<State>("s2", top);
-    auto s21 = make_shared<State>("s21", s2);
-    auto s211 = make_shared<State>("s211", s21);
+    shared_ptr<State> top = make_shared<TopState>("top");
+    shared_ptr<State> s1 = make_shared<S1State>("s1", top);
+    shared_ptr<State> s11 = make_shared<S11State>("s11", s1);
+    shared_ptr<State> s2 = make_shared<S2State>("s2", top);
+    shared_ptr<State> s21 = make_shared<S21State>("s21", s2);
+    shared_ptr<State> s211 = make_shared<S211State>("s211", s21);
 
     if (logger.isInformationEnable())
     {
@@ -58,48 +65,43 @@ int main()
                                         {s211,  Event{"G_EVENT"}, top}
     });
 
-    if (logger.isInformationEnable())
-    {
-        const std::string message = "Main:: Definition of events.";
-        logger.writeLog(LogType::INFORMATION_LOG, message);
-    }
-
 /* Define HSM */
     ExampleHSM example("exampleHSM", transitionTable, top);
-
-/* Define states' actions */
-    top->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-    s1->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-    s11->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-    s2->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-    s21->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-    s211->addEntryFunction(bind(&ExampleHSM::entryStateFunction, &example, std::placeholders::_1));
-
-    top->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-    s1->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-    s11->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-    s2->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-    s21->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-    s211->addExitFunction(bind(&ExampleHSM::exitStateFunction, &example, std::placeholders::_1));
-
-    top->addInitFunction(bind(&ExampleHSM::initTop, &example, std::placeholders::_1));
-    s1->addInitFunction(bind(&ExampleHSM::inits1, &example, std::placeholders::_1));
-    s11->addInitFunction(bind(&ExampleHSM::inits11, &example, std::placeholders::_1));
-    s2->addInitFunction(bind(&ExampleHSM::inits2, &example, std::placeholders::_1));
-    s21->addInitFunction(bind(&ExampleHSM::inits21, &example, std::placeholders::_1));
-    s211->addInitFunction(bind(&ExampleHSM::init211, &example, std::placeholders::_1));
-
     cout << transitionTable.showTable() << endl;
 
 /* Run Hierarchical State Machine */
-    example.start(); cout << endl;
+    if (logger.isInformationEnable())
+    {
+        const std::string message = "Main:: Start.";
+        logger.writeLog(LogType::INFORMATION_LOG, message);
+    }
+    cout << "*******************************************************" << endl;
+    cout << "\nTo move to the next state write event from 'a' to 'h'" << endl;
+    cout << "!!! To exit program write char out of defined range.\n" << endl;
+    cout << "*******************************************************" << endl;
 
-    example.handleEvent(transitionTable.getEvent("G_EVENT")); cout << endl;
-//    example.handleEvent(transitionTable.getEvent("B_EVENT")); cout << endl;
-//    example.handleEvent(transitionTable.getEvent("D_EVENT")); cout << endl;
-//    example.handleEvent(transitionTable.getEvent("E_EVENT")); cout << endl;
+    cout << "Start HSM: ";
+    example.start();
+    cout << endl;
+    cout << endl;
+
+/* Testing algorithm */
+    string eventKey;
+    while(1)
+    {
+        cout << "Write event: ";
+        cin >> eventKey;
+        eventKey = toupper(eventKey[0]);
+
+        if (eventKey[0] < 'A' || 'H' < eventKey[0])
+        {
+            break;
+        }
+        example.handleEvent(eventKey + "_EVENT");
+        cout << endl;
+        cout << endl;
+    }
 
 /* END */
-
     return 0;
 }
