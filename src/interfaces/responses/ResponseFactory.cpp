@@ -2,6 +2,7 @@
 #include "OpenedDoorBuilder.h"
 #include "ClosedDoorBuilder.h"
 #include "CoffeeDoneBuilder.h"
+#include "EndConnectionAckBuilder.h"
 
 using namespace std;
 using namespace communication;
@@ -20,6 +21,9 @@ unique_ptr<Response> ResponseFactory::createCommand(const vector<uint8_t> &comma
             return move(builder_->create(commandInBytes));
         case ResponseType::COFFEE_DONE:
             builder_ = make_unique<CoffeeDoneBuilder>();
+            return move(builder_->create(commandInBytes));
+        case ResponseType::END_CONNECTION_ACK:
+            builder_ = make_unique<EndConnectionAckBuilder>();
             return move(builder_->create(commandInBytes));
         default:
             throw invalid_argument("Received command does not register in factory.");

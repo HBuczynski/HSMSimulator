@@ -11,7 +11,8 @@ namespace communication
     {
         COFFEE_DONE = 0x01,
         DOOR_CLOSED = 0x02,
-        DOOR_OPENED = 0x03
+        DOOR_OPENED = 0x03,
+        END_CONNECTION_ACK = 0x04
     };
 
     class Response : public Frame

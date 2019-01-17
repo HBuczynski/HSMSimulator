@@ -4,6 +4,7 @@
 #include "OpenedDoorResponse.h"
 #include "ClosedDoorResponse.h"
 #include "CoffeeDoneResponse.h"
+#include "EndConnectionAckResponse.h"
 
 namespace communication
 {
@@ -16,6 +17,7 @@ namespace communication
         virtual void visit(OpenedDoorResponse& data) = 0;
         virtual void visit(ClosedDoorResponse& data) = 0;
         virtual void visit(CoffeeDoneResponse& data) = 0;
+        virtual void visit(EndConnectionAckResponse& data) = 0;
     };
 }
 

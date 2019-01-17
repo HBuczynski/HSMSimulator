@@ -11,7 +11,8 @@ namespace communication
     {
         MAKE_COFFEE = 0x01,
         CLOSE_DOOR = 0x02,
-        OPEN_DOOR = 0x03
+        OPEN_DOOR = 0x03,
+        END_CONNECTION = 0x04
     };
 
     class Command : public Frame
