@@ -26,6 +26,12 @@ namespace utility
 	public:
 		static Logger &getInstance(const std::string& moduleName  = "Log");
 
+		Logger(const Logger &) = delete;
+		Logger(Logger &&) = delete;
+
+		Logger operator=(const Logger& ) = delete;
+		Logger operator==(Logger &&) = delete;
+
         void initLogger(InitLogStructure logParameters);
 
 		void writeLog(LogType type, std::string rawMessage);
@@ -34,7 +40,6 @@ namespace utility
 		bool isDebugEnable();
 		bool isErrorEnable();
 		bool isWarningEnable();
-
 
 		void destroy();
 
