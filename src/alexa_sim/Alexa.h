@@ -16,34 +16,19 @@ namespace alexa
     public:
         Alexa(const std::string& name, const hsm::TransitionTable &transitionTable, std::shared_ptr<hsm::State> rootState);
 
-        bool initialize();
+        void initializeAlexaQueue(std::shared_ptr<communication::MessageQueueWrapper> queue);
+        void initializeUserQueue(std::shared_ptr<communication::MessageQueueWrapper> queue);
+
         void run();
-
-        void entryStateFunction(const std::string &name) noexcept;
-        void exitStateFunction(const std::string &name) noexcept;
-
-        void initAlexa(const std::string &name) noexcept;
-        void initIdle(const std::string &name) noexcept;
-        void initLocker(const std::string &name) noexcept;
-        void initOpenLocker(const std::string &name) noexcept;
-        void initCloseLocker(const std::string &name) noexcept;
-        void initCoffeeMaker(const std::string &name) noexcept;
-        void initLatte(const std::string &name) noexcept;
 
         void visit(communication::MakeCoffeeCommand &command) override;
         void visit(communication::OpenDoorCommand &command) override;
         void visit(communication::CloseDoorCommand &command) override;
+        void visit(communication::EndConnectionCommand &command) override;
 
     private:
-        bool initializeAlexaQueue();
-        bool initializeUserQueue();
-
-        void sendMessage(const std::vector<uint8_t>& message);
-
         std::atomic<bool> runSystem_;
-
         communication::CommandFactory commandFactory_;
-
         std::shared_ptr<communication::MessageQueueWrapper> alexaQueue_;
         std::shared_ptr<communication::MessageQueueWrapper> userQueue_;
 

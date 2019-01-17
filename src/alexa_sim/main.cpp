@@ -1,4 +1,14 @@
+#include <message_queue_wrapper/MessageQueueWrapper.h>
 #include <logger/Logger.h>
+
+#include "AlexaConfig.h"
+#include "IdleState.h"
+#include "LatteState.h"
+#include "AlexaState.h"
+#include "LockerState.h"
+#include "OpenLockerState.h"
+#include "CloseLockerState.h"
+#include "CoffeeMakerState.h"
 
 #include "Alexa.h"
 
@@ -7,8 +17,12 @@ using namespace hsm;
 using namespace alexa;
 using namespace utility;
 
+shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue();
+shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue();
+
 int main()
 {
+/* Define logger */
     Logger &logger = Logger::getInstance("Alexa");
 
     InitLogStructure struc;
@@ -20,58 +34,88 @@ int main()
     struc.writeOnConsole = true;
     logger.initLogger(struc);
 
-    auto alexa = make_shared<State>("alexa");
-    auto idle = make_shared<State>("idle", alexa);
-    auto locker = make_shared<State>("locker", alexa);
-    auto openLocker = make_shared<State>("openLocker", locker);
-    auto closeLocker = make_shared<State>("closeLocker", locker);
-    auto coffeeMaker = make_shared<State>("coffeeMaker", alexa);
-    auto latte = make_shared<State>("latte", coffeeMaker);
+/* Define msg queues */
+    auto userQueue = createUserMsgQueue();
+    auto alexaQueue = createAlexaMsgQueue();
 
+    if(userQueue.get() == nullptr || alexaQueue.get() == nullptr)
+    {
+        if(logger.isErrorEnable())
+        {
+            const string message = string("Alexa :: Did not create msg queues.");
+            logger.writeLog(LogType::ERROR_LOG, message);
+        }
+        return 0;
+    }
+
+/* Define states */
+    auto alexa = make_shared<AlexaState>("alexa");
+    auto idle = make_shared<IdleState>("idle", alexa);
+    auto locker = make_shared<LockerState>("locker", alexa);
+    auto openLocker = make_shared<OpenLockerState>("openLocker", locker);
+    auto closeLocker = make_shared<CloseLockerState>("closeLocker", locker);
+    auto coffeeMaker = make_shared<CoffeeMakerState>("coffeeMaker", alexa);
+    auto latte = make_shared<LatteState>("latte", coffeeMaker);
+
+/*Define transition table */
     TransitionTable transitionTable({
             {idle,         Event{"MAKE_COFFE"},        coffeeMaker},
             {coffeeMaker,   Event{"COFFEE_DONE"},       idle},
             {alexa,         Event{"CLOSE_DOOR"},        closeLocker},
             {alexa,         Event{"OPEN_DOOR"},         openLocker},
             {locker,        Event{"ACTIVATE_ALEXA"},    idle},
-
     });
-
     transitionTable.addNotBindState(latte);
+    cout << transitionTable.showTable() << endl;
+
+/* Initialise queue in states. */
+    closeLocker->initializeUserQueue(userQueue);
+    openLocker->initializeUserQueue(userQueue);
+    latte->initializeUserQueue(userQueue);
 
 /* Define HSM */
     Alexa alexaHSM("Alexa", transitionTable, alexa);
 
-/* Define states' actions */
-    alexa->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    idle->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    locker->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    openLocker->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    closeLocker->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    coffeeMaker->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-    latte->addEntryFunction(bind(&Alexa::entryStateFunction, &alexaHSM, std::placeholders::_1));
-
-    alexa->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    idle->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    locker->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    openLocker->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    closeLocker->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    coffeeMaker->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-    latte->addExitFunction(bind(&Alexa::exitStateFunction, &alexaHSM, std::placeholders::_1));
-
-    alexa->addInitFunction(bind(&Alexa::initAlexa, &alexaHSM, std::placeholders::_1));
-    idle->addInitFunction(bind(&Alexa::initIdle, &alexaHSM, std::placeholders::_1));
-    locker->addInitFunction(bind(&Alexa::initLocker, &alexaHSM, std::placeholders::_1));
-    openLocker->addInitFunction(bind(&Alexa::initOpenLocker, &alexaHSM, std::placeholders::_1));
-    closeLocker->addInitFunction(bind(&Alexa::initCloseLocker, &alexaHSM, std::placeholders::_1));
-    coffeeMaker->addInitFunction(bind(&Alexa::initCoffeeMaker, &alexaHSM, std::placeholders::_1));
-    latte->addInitFunction(bind(&Alexa::initLatte, &alexaHSM, std::placeholders::_1));
-
-    cout << transitionTable.showTable() << endl;
-
 /* Run Hierarchical State Machine */
-    alexaHSM.initialize();
+    alexaHSM.initializeAlexaQueue(alexaQueue);
+    alexaHSM.initializeUserQueue(userQueue);
     alexaHSM.run();
 
     return 0;
+}
+
+shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue()
+{
+    shared_ptr<communication::MessageQueueWrapper> userQueue = nullptr;
+    AlexaConfiguration configuration;
+    try
+    {
+        userQueue = make_shared<communication::MessageQueueWrapper>(configuration.userMsgQueueName,
+                                                                    configuration.queueLength,
+                                                                    configuration.messageQueueSize);
+    }
+    catch(boost::interprocess::interprocess_exception &ex)
+    {
+        return userQueue;
+    }
+
+    return userQueue;
+}
+
+shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue()
+{
+    shared_ptr<communication::MessageQueueWrapper> alexaQueue = nullptr;
+    AlexaConfiguration configuration;
+    try
+    {
+        alexaQueue = make_shared<communication::MessageQueueWrapper>(configuration.alexaMsgQueueName,
+                                                                     configuration.queueLength,
+                                                                     configuration.messageQueueSize);
+    }
+    catch(boost::interprocess::interprocess_exception &ex)
+    {
+        return alexaQueue;
+    }
+
+    return alexaQueue;
 }

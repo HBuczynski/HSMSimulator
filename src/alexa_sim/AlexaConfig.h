@@ -12,7 +12,7 @@ namespace alexa
 
         uint16_t queueLength = 200;
         uint16_t messageQueueSize = 200;
-    } alexaConfiguration;
+    };
 }
 
 #endif //HSMSIMULATOR_ALEXACONFIG_H
