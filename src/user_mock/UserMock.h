@@ -9,43 +9,36 @@
 
 #include <atomic>
 
-class UserMock : public hsm::HSM, public communication::ResponseVisitor
+namespace user
 {
-public:
-    UserMock(const std::string& name, const hsm::TransitionTable &transitionTable, std::shared_ptr<hsm::State> rootState);
+    class UserMock
+            : public hsm::HSM, public communication::ResponseVisitor
+    {
+    public:
+        UserMock(const std::string &name, const hsm::TransitionTable &transitionTable,
+                 std::shared_ptr<hsm::State> rootState);
 
-    bool initialize();
-    void run();
+        void initializeAlexaQueue(std::shared_ptr<communication::MessageQueueWrapper> queue);
+        void initializeUserQueue(std::shared_ptr<communication::MessageQueueWrapper> queue);
+        void run();
 
-    void entryStateFunction(const std::string &name) noexcept;
-    void exitStateFunction(const std::string &name) noexcept;
+        void visit(communication::OpenedDoorResponse &data) override;
+        void visit(communication::ClosedDoorResponse &data) override;
+        void visit(communication::CoffeeDoneResponse &data) override;
+        void visit(communication::EndConnectionAckResponse &data) override;
 
-    void visit(communication::OpenedDoorResponse &data) override;
-    void visit(communication::ClosedDoorResponse &data) override;
-    void visit(communication::CoffeeDoneResponse &data) override;
+    private:
+        void sendMessage(const std::vector<uint8_t> &message);
 
-    void initUser(const std::string &name) noexcept;
-    void initSleeping(const std::string &name) noexcept;
-    void initMakeCoffee(const std::string &name) noexcept;
-    void initDrinkCoffee(const std::string &name) noexcept;
-    void initGoOut(const std::string &name) noexcept;
-    void initGoIn(const std::string &name) noexcept;
+        std::atomic<bool> runSystem_;
 
-private:
-    bool initializeAlexaQueue();
-    bool initializeUserQueue();
+        communication::ResponseFactory responseFactory_;
 
-    void sendMessage(const std::vector<uint8_t>& message);
+        std::shared_ptr<communication::MessageQueueWrapper> alexaQueue_;
+        std::shared_ptr<communication::MessageQueueWrapper> userQueue_;
 
-    std::atomic<bool> runSystem_;
-
-    communication::ResponseFactory responseFactory_;
-
-    std::shared_ptr<communication::MessageQueueWrapper> alexaQueue_;
-    std::shared_ptr<communication::MessageQueueWrapper> userQueue_;
-
-    utility::Logger &logger_;
-};
-
+        utility::Logger &logger_;
+    };
+}
 
 #endif
