@@ -12,18 +12,16 @@ namespace hsm
     {
     public:
         TransitionTable() = delete;
-        TransitionTable(std::initializer_list<TranasitionElement> statesTable);
-
-        const std::vector<TranasitionElement> &getTransitionTable() const noexcept;
-        std::string showTable() const noexcept;
+        TransitionTable(std::initializer_list<TranasitionElement> transitionTable);
 
         void addNotBindState(std::shared_ptr<State> state);
 
-        std::shared_ptr<State> getState(std::string id);
         Event getEvent(std::string key);
+        std::shared_ptr<State> getState(std::string id);
+        const std::vector<TranasitionElement> &getTransitionTable() const noexcept;
 
+        std::string showTable() const noexcept;
     private:
-
         void addNewEvent(Event event);
 
         std::unordered_map<std::string, std::shared_ptr<State> > states_;

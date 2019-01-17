@@ -13,23 +13,21 @@ namespace hsm
         virtual ~HSM() = default;
 
         void start();
-        void handleEvent(Event event) noexcept;
-
-    protected:
-        void defineInternalState(const std::string &name) noexcept;
-
-        TransitionTable transitionTable_;
+        void handleEvent(const std::string &eventName) noexcept;
 
     private:
+        void registerInternalState(const std::string &name) noexcept;
         void stateTransition(std::shared_ptr<State> state) noexcept;
+
         void tracePathToTarget();
+
         uint16_t leastCommonAncestor(std::shared_ptr<State> state);
         void exitToLCA(uint16_t toLCA);
 
-        std::shared_ptr<State> nextState_;
-
         const std::string NAME;
+        TransitionTable transitionTable_;
 
+        std::shared_ptr<State> nextState_;
         std::shared_ptr<State> sourceState_;
         std::shared_ptr<State> currentState_;
         std::shared_ptr<State> rootState_;

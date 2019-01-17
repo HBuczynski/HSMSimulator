@@ -19,36 +19,33 @@ namespace hsm
         State() = delete;
         State(const std::string &name, std::shared_ptr<State> parent = nullptr);
 
+        static void initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState);
         void addTransition(Event event, std::shared_ptr<State> state);
         std::shared_ptr<State> moveToState(Event event);
 
-        void addInitFunction(Callback init) noexcept;
-        void addEntryFunction(Callback entry) noexcept;
-        void addExitFunction(Callback exit) noexcept;
+        virtual void runEntryEvent() = 0;
+        virtual void runExitEvent() = 0;
+        virtual void runInitEvent() = 0;
 
-        void runEntryEvent() const noexcept;
-        void runExitEvent() const noexcept;
-        void runInitEvent() const noexcept;
-
-        const std::string& getName() const noexcept;
+        const std::string &getName() const noexcept;
         const uint32_t &getID() const noexcept;
         std::shared_ptr<State> getParent() const noexcept;
 
         bool operator==(const State &rhs);
         State &operator=(const State &rhs);
 
-    private:
-        std::weak_ptr<State> parent_;
-        std::unordered_map<Event, std::weak_ptr<State>> stateTable_;
-
-        Callback initFunction_;
-        Callback entryFunction_;
-        Callback exitFunction_;
-
-        std::string name_;
-        uint32_t id_;
+    protected:
+        static Callback handleEvent_;
+        static Callback registerInternalState_;
 
         utility::Logger &logger_;
+    private:
+        uint32_t id_;
+        std::string name_;
+        static bool isCallbackInitialized;
+
+        std::weak_ptr<State> parent_;
+        std::unordered_map<Event, std::weak_ptr<State>> stateTable_;
     };
 }
 

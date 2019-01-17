@@ -7,15 +7,27 @@ using namespace std;
 using namespace hsm;
 using namespace utility;
 
+Callback State::handleEvent_ = nullptr;
+Callback State::registerInternalState_ = nullptr;
+bool State::isCallbackInitialized = false;
+
 State::State(const string &name, shared_ptr<State> parent)
-    : parent_(parent),
-      initFunction_(nullptr),
-      entryFunction_(nullptr),
-      exitFunction_(nullptr),
-      name_(move(name)),
+    : logger_(Logger::getInstance()),
       id_(Utility::getStateID()),
-      logger_(Logger::getInstance())
+      name_(move(name)),
+      parent_(parent)
 {}
+
+void State::initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState)
+{
+    if (!isCallbackInitialized )
+    {
+        handleEvent_ = handleEvent;
+        registerInternalState_ = registerInternalState;
+
+        isCallbackInitialized = true;
+    }
+}
 
 void State::addTransition(Event event, shared_ptr<State> state)
 {
@@ -58,69 +70,6 @@ shared_ptr<State> State::moveToState(Event event)
     return nullptr;
 }
 
-void State::addInitFunction(Callback init) noexcept
-{
-    initFunction_ = init;
-}
-
-void State::addEntryFunction(Callback entry) noexcept
-{
-    entryFunction_ = entry;
-}
-
-void State::addExitFunction(Callback exit) noexcept
-{
-    exitFunction_ = exit;
-}
-
-void State::runEntryEvent() const noexcept
-{
-    if(entryFunction_)
-    {
-        entryFunction_(name_);
-    }
-    else
-    {
-        if(logger_.isErrorEnable())
-        {
-            const std::string message = "State:: " + name_ + " - entry function is not defined.";
-            logger_.writeLog(LogType::ERROR_LOG, message);
-        }
-    }
-}
-
-void State::runExitEvent() const noexcept
-{
-    if(exitFunction_)
-    {
-        exitFunction_(name_);
-    }
-    else
-    {
-        if(logger_.isErrorEnable())
-        {
-            const std::string message = "State:: " + name_ + " - exit function is not defined.";
-            logger_.writeLog(LogType::ERROR_LOG, message);
-        }
-    }
-}
-
-void State::runInitEvent() const noexcept
-{
-    if(initFunction_)
-    {
-        initFunction_(name_);
-    }
-    else
-    {
-        if(logger_.isErrorEnable())
-        {
-            const std::string message = "State:: " + name_ + " - init function is not defined.";
-            logger_.writeLog(LogType::ERROR_LOG, message);
-        }
-    }
-}
-
 const string &State::getName() const noexcept
 {
     return name_;
@@ -146,13 +95,8 @@ State &State::operator=(const State &rhs)
     parent_ = rhs.parent_;
     stateTable_ = rhs.stateTable_;
 
-    initFunction_ = rhs.initFunction_;
-    entryFunction_ = rhs.entryFunction_;
-    exitFunction_ = rhs.exitFunction_;
-
     id_ = rhs.id_;
     name_ = rhs.name_;
 
     return *this;
 }
-

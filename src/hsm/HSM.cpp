@@ -7,14 +7,17 @@ using namespace std;
 using namespace hsm;
 
 HSM::HSM(const string& name, const TransitionTable &transitionTable, shared_ptr<State> rootState)
-    : transitionTable_(transitionTable),
+:     NAME(name),
+      transitionTable_(transitionTable),
       nextState_(nullptr),
-      NAME(name),
       sourceState_(nullptr),
       currentState_(nullptr),
       rootState_(rootState)
 {
     assert((rootState != nullptr) && "You dont' initialized root state.");
+
+    rootState_->initializeHSMCallbacks(bind(&HSM::handleEvent, this, std::placeholders::_1),
+                                       bind(&HSM::registerInternalState, this, std::placeholders::_1));
 }
 
 void HSM::start()
@@ -28,9 +31,10 @@ void HSM::start()
     }
 }
 
-void HSM::handleEvent(Event event) noexcept
+void HSM::handleEvent(const std::string &eventName) noexcept
 {
     vector<shared_ptr<State>> path;
+    const auto event = transitionTable_.getEvent(eventName);
 
     for(auto pathNode = currentState_; pathNode.get() != nullptr; pathNode = pathNode->getParent())
     {
@@ -73,7 +77,7 @@ void HSM::tracePathToTarget()
     nextState_ = nullptr;
 }
 
-void HSM::defineInternalState(const string &name) noexcept
+void HSM::registerInternalState(const string &name) noexcept
 {
     nextState_ = transitionTable_.getState(name);
 }
