@@ -11,9 +11,7 @@ namespace communication
     enum class FrameType : uint8_t
     {
         RESPONSE = 0x10,
-        MEASUREMENT_DATA = 0x20,
-        COMMAND = 0x30,
-        NOTIFICATION = 0x40
+        COMMAND = 0x20
     };
 
     class Frame
