@@ -1,8 +1,8 @@
 # Specify the minimum version of cmake.
 cmake_minimum_required(VERSION 3.0)
 
-project(example)
-set(PROJECT_NAME example)
+project(state_machine)
+set(PROJECT_NAME state_machine)
 
 include_directories(../)
 

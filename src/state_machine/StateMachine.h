@@ -5,10 +5,10 @@
 
 namespace example
 {
-    class ExampleHSM final : public hsm::HSM
+    class StateMachine final : public hsm::HSM
     {
     public:
-        ExampleHSM(const std::string &name, const hsm::TransitionTable &transitionTable,
+        StateMachine(const std::string &name, const hsm::TransitionTable &transitionTable,
                    std::shared_ptr<hsm::State> rootState);
 
     };

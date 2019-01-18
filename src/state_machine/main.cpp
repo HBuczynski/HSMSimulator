@@ -6,7 +6,7 @@
 #include "S11State.h"
 #include "TopState.h"
 #include "S211State.h"
-#include "ExampleHSM.h"
+#include "StateMachine.h"
 
 using namespace hsm;
 using namespace std;
@@ -18,14 +18,14 @@ int main()
 /* Initialize logger */
     Logger &logger = Logger::getInstance("Example");
 
-    InitLogStructure struc;
-    struc.debugLog = true;
-    struc.errroLog = true;
-    struc.informationLog = true;
-    struc.warningLog = true;
-    struc.writeLogsInSeparetFiles = true;
-    struc.writeOnConsole = true;
-    logger.initLogger(struc);
+    InitLogStructure initLogStructure;
+    initLogStructure.debugLog = true;
+    initLogStructure.errroLog = true;
+    initLogStructure.informationLog = true;
+    initLogStructure.warningLog = true;
+    initLogStructure.writeLogsInSeparetFiles = true;
+    initLogStructure.writeOnConsole = true;
+    logger.initLogger(initLogStructure);
 
     if (logger.isInformationEnable())
     {
@@ -66,13 +66,13 @@ int main()
     });
 
 /* Define HSM */
-    ExampleHSM example("exampleHSM", transitionTable, top);
+    StateMachine example("exampleHSM", transitionTable, top);
     cout << transitionTable.showTable() << endl;
 
 /* Run Hierarchical State Machine */
     if (logger.isInformationEnable())
     {
-        const std::string message = "Main:: Start.";
+        const string message = "Main:: Start.";
         logger.writeLog(LogType::INFORMATION_LOG, message);
     }
     cout << "*******************************************************" << endl;
@@ -95,6 +95,7 @@ int main()
 
         if (eventKey[0] < 'A' || 'H' < eventKey[0])
         {
+            cout << "HSM cannot handle this event." << endl;
             break;
         }
         example.handleEvent(eventKey + "_EVENT");
