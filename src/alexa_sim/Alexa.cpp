@@ -18,7 +18,7 @@ void Alexa::initializeAlexaQueue(shared_ptr<MessageQueueWrapper> queue)
     alexaQueue_ = queue;
 }
 
-void Alexa::initializeUserQueue(std::shared_ptr<communication::MessageQueueWrapper> queue)
+void Alexa::initializeUserQueue(shared_ptr<communication::MessageQueueWrapper> queue)
 {
     userQueue_ = queue;
 }
@@ -52,7 +52,7 @@ void Alexa::visit(MakeCoffeeCommand &command)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("CommandHandler :: Received ") + command.getName();
+        const string message = string("CommandHandler :: Received ") + command.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -63,7 +63,7 @@ void Alexa::visit(OpenDoorCommand &command)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("CommandHandler :: Received ") + command.getName();
+        const string message = string("CommandHandler :: Received ") + command.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -74,7 +74,7 @@ void Alexa::visit(CloseDoorCommand &command)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("CommandHandler :: Received ") + command.getName();
+        const string message = string("CommandHandler :: Received ") + command.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -85,7 +85,7 @@ void Alexa::visit(communication::EndConnectionCommand &command)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("CommandHandler :: Received ") + command.getName();
+        const string message = string("CommandHandler :: Received ") + command.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -93,7 +93,7 @@ void Alexa::visit(communication::EndConnectionCommand &command)
 
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("Alexa is going to switch off.");
+        const string message = string("Alexa is going to switch off.");
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 

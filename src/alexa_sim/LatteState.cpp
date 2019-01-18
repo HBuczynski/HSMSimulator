@@ -7,11 +7,11 @@ using namespace std;
 using namespace alexa;
 using namespace utility;
 
-LatteState::LatteState(const std::string &name, shared_ptr<State> parent)
+LatteState::LatteState(const string &name, shared_ptr<State> parent)
         : State(name, parent)
 {}
 
-void LatteState::initializeUserQueue(std::shared_ptr<communication::MessageQueueWrapper> queue)
+void LatteState::initializeUserQueue(shared_ptr<communication::MessageQueueWrapper> queue)
 {
     userQueue_ = queue;
 }
@@ -20,7 +20,7 @@ void LatteState::runEntryEvent()
 {
     if (logger_.isInformationEnable())
     {
-        const std::string message = string("Alexa:: ") + "Alexa entry in ##State: " + getName();
+        const string message = string("Alexa:: ") + "Alexa entry in ##State: " + getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 }
@@ -29,7 +29,7 @@ void LatteState::runExitEvent()
 {
     if (logger_.isInformationEnable())
     {
-        const std::string message = string("Alexa:: ") + "Alexa exit from ##State: " + getName();
+        const string message = string("Alexa:: ") + "Alexa exit from ##State: " + getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 }
@@ -38,7 +38,7 @@ void LatteState::runInitEvent()
 {
     if (logger_.isInformationEnable())
     {
-        const std::string message = string("Alexa:: ") + "Wow coffee has done!! Send info to user.";
+        const string message = string("Alexa:: ") + "Wow coffee has done!! Send info to user.";
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 

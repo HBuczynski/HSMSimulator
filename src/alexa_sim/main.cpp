@@ -17,8 +17,7 @@ using namespace hsm;
 using namespace alexa;
 using namespace utility;
 
-shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue();
-shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue();
+shared_ptr<communication::MessageQueueWrapper> createMsgQueue(const string &name);
 
 int main()
 {
@@ -35,10 +34,11 @@ int main()
     logger.initLogger(struc);
 
 /* Define msg queues */
-    auto userQueue = createUserMsgQueue();
-    auto alexaQueue = createAlexaMsgQueue();
+    AlexaConfiguration configuration;
+    auto userQueue = createMsgQueue(configuration.userMsgQueueName);
+    auto alexaQueue = createMsgQueue(configuration.alexaMsgQueueName);
 
-    if(userQueue.get() == nullptr || alexaQueue.get() == nullptr)
+    if(userQueue == nullptr || alexaQueue == nullptr)
     {
         if(logger.isErrorEnable())
         {
@@ -65,7 +65,7 @@ int main()
             {alexa,         Event{"OPEN_DOOR"},         openLocker},
             {locker,        Event{"ACTIVATE_ALEXA"},    idle},
     });
-    transitionTable.addNotBindState(latte);
+    transitionTable.addUnboundState(latte);
     cout << transitionTable.showTable() << endl;
 
 /* Initialise queue in states. */
@@ -84,38 +84,17 @@ int main()
     return 0;
 }
 
-shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue()
+shared_ptr<communication::MessageQueueWrapper> createMsgQueue(const string &name)
 {
-    shared_ptr<communication::MessageQueueWrapper> userQueue = nullptr;
-    AlexaConfiguration configuration;
     try
     {
-        userQueue = make_shared<communication::MessageQueueWrapper>(configuration.userMsgQueueName,
-                                                                    configuration.queueLength,
-                                                                    configuration.messageQueueSize);
+        AlexaConfiguration configuration;
+        return make_shared<communication::MessageQueueWrapper>(name,
+                                                               configuration.queueLength,
+                                                               configuration.messageQueueSize);
     }
     catch(boost::interprocess::interprocess_exception &ex)
     {
-        return userQueue;
+        return nullptr;
     }
-
-    return userQueue;
-}
-
-shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue()
-{
-    shared_ptr<communication::MessageQueueWrapper> alexaQueue = nullptr;
-    AlexaConfiguration configuration;
-    try
-    {
-        alexaQueue = make_shared<communication::MessageQueueWrapper>(configuration.alexaMsgQueueName,
-                                                                     configuration.queueLength,
-                                                                     configuration.messageQueueSize);
-    }
-    catch(boost::interprocess::interprocess_exception &ex)
-    {
-        return alexaQueue;
-    }
-
-    return alexaQueue;
 }
