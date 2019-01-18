@@ -26,7 +26,7 @@ add_subdirectory("src/utility"                                                  
 add_subdirectory("src/hsm"                                                      hsm                     )
 
 if((${TARGET_APP} STREQUAL HSMExample))
-    add_subdirectory("src/example"                                              example                 )
+    add_subdirectory("src/state_machine"                                        state_machine           )
 elseif(${TARGET_APP} STREQUAL AlexaSim)
     add_subdirectory("src/alexa_sim"                                            alexa_sim               )
     add_subdirectory("src/message_queue_wrapper"                                message_queue_wrapper   )
