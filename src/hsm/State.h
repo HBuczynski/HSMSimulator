@@ -16,10 +16,9 @@ namespace hsm
     class State
     {
     public:
-        State() = delete;
         State(const std::string &name, std::shared_ptr<State> parent = nullptr);
 
-        static void initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState);
+        void initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState);
         void addTransition(Event event, std::shared_ptr<State> state);
         std::shared_ptr<State> moveToState(Event event);
 
@@ -35,14 +34,14 @@ namespace hsm
         State &operator=(const State &rhs);
 
     protected:
-        static Callback handleEvent_;
-        static Callback registerInternalState_;
+        Callback handleEvent_;
+        Callback registerInternalState_;
 
         utility::Logger &logger_;
     private:
         uint32_t id_;
         std::string name_;
-        static bool isCallbackInitialized;
+        bool isCallbackInitialized;
 
         std::weak_ptr<State> parent_;
         std::unordered_map<Event, std::weak_ptr<State>> stateTable_;

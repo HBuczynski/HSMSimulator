@@ -14,7 +14,8 @@ namespace hsm
         TransitionTable() = delete;
         TransitionTable(std::initializer_list<TranasitionElement> transitionTable);
 
-        void addNotBindState(std::shared_ptr<State> state);
+        void addUnboundState(std::shared_ptr<State> state);
+        void initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState);
 
         Event getEvent(std::string key);
         std::shared_ptr<State> getState(std::string id);

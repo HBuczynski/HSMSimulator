@@ -7,61 +7,63 @@ using namespace std;
 using namespace hsm;
 using namespace utility;
 
-Callback State::handleEvent_ = nullptr;
-Callback State::registerInternalState_ = nullptr;
-bool State::isCallbackInitialized = false;
-
 State::State(const string &name, shared_ptr<State> parent)
-    : logger_(Logger::getInstance()),
+    : handleEvent_(nullptr),
+      registerInternalState_(nullptr),
+      logger_(Logger::getInstance()),
       id_(Utility::getStateID()),
       name_(move(name)),
+      isCallbackInitialized(false),
       parent_(parent)
 {}
 
 void State::initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState)
 {
-    if (!isCallbackInitialized )
-    {
-        handleEvent_ = handleEvent;
-        registerInternalState_ = registerInternalState;
-
-        isCallbackInitialized = true;
-    }
+    if ( isCallbackInitialized )
+        return;
+    
+    handleEvent_ = handleEvent;
+    registerInternalState_ = registerInternalState;
 }
 
 void State::addTransition(Event event, shared_ptr<State> state)
 {
-    const auto isRegistered = stateTable_.find(event);
+    const auto stateIter = stateTable_.find(event);
 
-    if(isRegistered == stateTable_.cend())
+    // Register new state in a hash map.
+    if(stateIter == stateTable_.cend())
     {
         stateTable_[event] = state;
+        return;
     }
-    else if( (stateTable_[event].lock() != nullptr) && (stateTable_[event].lock()->getID() == state->getID()) )
+    
+    // User tried to add the same transition.
+    if( (stateTable_[event].lock() != nullptr) && (stateTable_[event].lock()->getID() == state->getID()) )
     {
         if (logger_.isWarningEnable())
         {
-            const std::string message = "State:: " + name_ + " - tried to add the same transition second time.";
+            const string message = "State:: " + name_ + " - tried to add the same transition second time.";
             logger_.writeLog(LogType::WARNING_LOG, message);
         }
+        return;
     }
-    else
+    
+    // Transition is repeated.
+    // Logical error - stops program work.
+    if (logger_.isErrorEnable())
     {
-        if (logger_.isErrorEnable())
-        {
-            const std::string message = "State:: " + name_ + " - cannot assign event to - " + state->getName();
-            logger_.writeLog(LogType::ERROR_LOG, message);
-        }
-
-        assert(0 && "You have tried to add another state to existing event.");
+        const string message = "State:: " + name_ + " - cannot assign event to - " + state->getName();
+        logger_.writeLog(LogType::ERROR_LOG, message);
     }
+
+    assert(0 && "You have tried to add another state to existing event.");
 }
 
 shared_ptr<State> State::moveToState(Event event)
 {
-    const auto isRegistered = stateTable_.find(event);
+    const auto stateIter = stateTable_.find(event);
 
-    if(isRegistered != stateTable_.cend())
+    if(stateIter != stateTable_.cend())
     {
         auto nextState = stateTable_[event];
         return nextState.lock();

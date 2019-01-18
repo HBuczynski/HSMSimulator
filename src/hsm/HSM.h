@@ -8,7 +8,6 @@ namespace hsm
     class HSM
     {
     public:
-        HSM() = delete;
         HSM(const std::string& name, const TransitionTable &transitionTable, std::shared_ptr<State> rootState);
         virtual ~HSM() = default;
 
@@ -17,12 +16,12 @@ namespace hsm
 
     private:
         void registerInternalState(const std::string &name) noexcept;
-        void stateTransition(std::shared_ptr<State> state) noexcept;
+        void makeTransition(std::shared_ptr<State> state) noexcept;
 
-        void tracePathToTarget();
+        void tracePathToTargetState();
 
-        uint16_t leastCommonAncestor(std::shared_ptr<State> state);
-        void exitToLCA(uint16_t toLCA);
+        uint16_t findCommonAncestor(std::shared_ptr<State> state);
+        void exitToCommonAncestor(uint16_t toLCA);
 
         const std::string NAME;
         TransitionTable transitionTable_;

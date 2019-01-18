@@ -16,47 +16,59 @@ HSM::HSM(const string& name, const TransitionTable &transitionTable, shared_ptr<
 {
     assert((rootState != nullptr) && "You dont' initialized root state.");
 
-    rootState_->initializeHSMCallbacks(bind(&HSM::handleEvent, this, std::placeholders::_1),
-                                       bind(&HSM::registerInternalState, this, std::placeholders::_1));
+    // Initialize static callbacks to allow states to register internal states
+    // or handler event in specific situations.
+    Callback handleEvent = bind(&HSM::handleEvent, this, std::placeholders::_1);
+    Callback registerInternalState = bind(&HSM::registerInternalState, this, std::placeholders::_1);
+
+    transitionTable_.initializeHSMCallbacks(handleEvent, registerInternalState);
+    rootState_->initializeHSMCallbacks(handleEvent, registerInternalState);
 }
 
 void HSM::start()
 {
+    // Initialize current state as root.
     currentState_ = rootState_;
     currentState_->runEntryEvent();
 
+    // Go from root to the leaf - starting point of the HSM.
     while (currentState_->runInitEvent(), nextState_.get())
     {
-        tracePathToTarget();
+        tracePathToTargetState();
     }
 }
 
 void HSM::handleEvent(const std::string &eventName) noexcept
 {
-    vector<shared_ptr<State>> path;
     const auto event = transitionTable_.getEvent(eventName);
-
-    for(auto pathNode = currentState_; pathNode.get() != nullptr; pathNode = pathNode->getParent())
+    for(auto pathNode = currentState_; pathNode != nullptr; pathNode = pathNode->getParent())
     {
+        // Register sourceState as a state which contains event.
         sourceState_= pathNode;
+        // Check if state contains transition to event.
         auto state = sourceState_->moveToState(event);
 
-        if(state.get() != nullptr)
+        if ( state == nullptr )
+            continue;
+
+        // Find the common ancestor for source state and target state (in this case already next state).
+        // Exit from source state to the common ancestor.
+        makeTransition(state);
+
+        if( nextState_ )
         {
-            stateTransition(state);
-            if(nextState_.get())
+            // Trace path from common ancestor to target state.
+            tracePathToTargetState();
+
+            while (currentState_->runInitEvent(), nextState_)
             {
-                tracePathToTarget();
-                while (currentState_->runInitEvent(), nextState_.get())
-                {
-                   tracePathToTarget();
-                }
-            };
+                tracePathToTargetState();
+            }
         }
     }
 }
 
-void HSM::tracePathToTarget()
+void HSM::tracePathToTargetState()
 {
     vector<shared_ptr<State>> path;
 
@@ -82,40 +94,38 @@ void HSM::registerInternalState(const string &name) noexcept
     nextState_ = transitionTable_.getState(name);
 }
 
-void HSM::stateTransition(shared_ptr<State> state) noexcept
+void HSM::makeTransition(shared_ptr<State> state) noexcept
 {
-    const auto lca = leastCommonAncestor(state);
-    exitToLCA(lca);
+    // Find common ancestor for source state of event and target state.
+    const auto lca = findCommonAncestor(state);
+    // Exit to ancestor state for both source and target state.
+    exitToCommonAncestor(lca);
 
     nextState_ = state;
 }
 
-uint16_t HSM::leastCommonAncestor(std::shared_ptr<State> targetState)
+uint16_t HSM::findCommonAncestor(std::shared_ptr<State> targetState)
 {
-    uint16_t lsa{};
-
     if(sourceState_ != targetState)
     {
-        for(auto state = sourceState_; state.get() != nullptr; ++lsa, state = state->getParent())
+        uint16_t lsa = 0u;
+        for(auto sourceParentState = sourceState_; sourceParentState != nullptr; ++lsa, sourceParentState = sourceParentState->getParent())
         {
-            for (auto state2 = targetState; state2.get() != nullptr; state2 = state2->getParent())
+            for (auto parentTargetState = targetState; parentTargetState != nullptr; parentTargetState = parentTargetState->getParent())
             {
-                if(state == state2)
+                if(sourceParentState == parentTargetState)
                 {
                     return lsa;
                 }
             }
         }
-    }
-    else
-    {
-        return 1;
+        return 0;
     }
 
-    return 0;
+    return 1;
 }
 
-void HSM::exitToLCA(uint16_t toLCA)
+void HSM::exitToCommonAncestor(uint16_t toLCA)
 {
     auto state = currentState_;
 

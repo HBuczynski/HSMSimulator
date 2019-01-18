@@ -10,31 +10,42 @@ TransitionTable::TransitionTable(initializer_list<TranasitionElement> transition
 {
     for(auto &element : transitionTable)
     {
+        // Register transition in internal state's hash map.
         get<0>(element)->addTransition(get<1>(element), get<2>(element));
 
-        addNotBindState(get<0>(element));
-        addNotBindState(get<2>(element));
+        // Add states to internal transition table's container using public method.
+        addUnboundState(get<0>(element));
+        addUnboundState(get<2>(element));
+        // Register new event in the container.
         addNewEvent(get<1>(element));
 
-        transitionVector_.push_back(move(element));
+        transitionVector_.push_back(element);
+    }
+}
+
+void TransitionTable::initializeHSMCallbacks(Callback handleEvent, Callback registerInternalState)
+{
+    for(auto &state : states_)
+    {
+        state.second->initializeHSMCallbacks(handleEvent, registerInternalState);
     }
 }
 
 void TransitionTable::addNewEvent(Event event)
 {
-    const auto isRegistered = events_.find(event.getKey());
+    const auto eventIter = events_.find(event.getKey());
 
-    if(isRegistered == events_.cend())
+    if(eventIter == events_.cend())
     {
         events_.insert({event.getKey(), event});
     }
 }
 
-void TransitionTable::addNotBindState(shared_ptr<State> state)
+void TransitionTable::addUnboundState(shared_ptr<State> state)
 {
-    const auto isRegistered = states_.find(state->getName());
+    const auto stateIter = states_.find(state->getName());
 
-    if(isRegistered == states_.cend())
+    if(stateIter == states_.cend())
     {
         states_[state->getName()] = state;
     }
@@ -42,23 +53,21 @@ void TransitionTable::addNotBindState(shared_ptr<State> state)
 
 Event TransitionTable::getEvent(string id)
 {
-    const auto isRegistered = events_.find(id);
+    const auto eventIter = events_.find(id);
 
-    if(isRegistered != events_.cend())
+    if(eventIter != events_.cend())
     {
-        return (*isRegistered).second;
+        return (*eventIter).second;
     }
-    else
-    {
-        return Event{""};
-    }
+
+    return Event{""};
 }
 
 shared_ptr<State> TransitionTable::getState(string id)
 {
-    const auto isRegistered = states_.find(id);
+    const auto stateIter = states_.find(id);
 
-    if(isRegistered != states_.cend())
+    if(stateIter != states_.cend())
     {
         return states_[id];
     }
