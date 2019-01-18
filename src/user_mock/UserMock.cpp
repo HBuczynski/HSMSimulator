@@ -14,12 +14,12 @@ UserMock::UserMock(const string &name, const TransitionTable &transitionTable, s
           logger_(Logger::getInstance())
 {}
 
-void UserMock::initializeAlexaQueue(std::shared_ptr<communication::MessageQueueWrapper> queue)
+void UserMock::initializeAlexaQueue(shared_ptr<communication::MessageQueueWrapper> queue)
 {
     alexaQueue_ = queue;
 }
 
-void UserMock::initializeUserQueue(std::shared_ptr<communication::MessageQueueWrapper> queue)
+void UserMock::initializeUserQueue(shared_ptr<communication::MessageQueueWrapper> queue)
 {
     userQueue_ = queue;
 }
@@ -53,7 +53,7 @@ void UserMock::visit(communication::OpenedDoorResponse &data)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("User:: Received ") + data.getName();
+        const string message = string("User:: Received ") + data.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -64,13 +64,13 @@ void UserMock::visit(communication::ClosedDoorResponse &data)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("User:: Received ") + data.getName();
+        const string message = string("User:: Received ") + data.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
     if (logger_.isInformationEnable())
     {
-        const std::string message = string("User:: ") + "After several hours user come back to house.";
+        const string message = string("User:: ") + "After several hours user come back to house.";
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
@@ -83,14 +83,14 @@ void UserMock::visit(communication::CoffeeDoneResponse &data)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("User:: Received ") + data.getName();
+        const string message = string("User:: Received ") + data.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
     handleEvent("COFFEE_DONE");
 }
 
-void UserMock::sendMessage(const std::vector<uint8_t> &message)
+void UserMock::sendMessage(const vector<uint8_t> &message)
 {
     alexaQueue_->send(message);
 }
@@ -99,13 +99,13 @@ void UserMock::visit(communication::EndConnectionAckResponse &data)
 {
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("User:: Received ") + data.getName();
+        const string message = string("User:: Received ") + data.getName();
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 
     if(logger_.isInformationEnable())
     {
-        const std::string message = std::string("User:: User shuts down the application.");
+        const string message = string("User:: User shuts down the application.");
         logger_.writeLog(LogType::INFORMATION_LOG, message);
     }
 

@@ -11,7 +11,7 @@ GoingOutState::GoingOutState(const std::string &name, shared_ptr<State> parent)
         : State(name, parent)
 {}
 
-void GoingOutState::initializeAlexaQueue(std::shared_ptr<communication::MessageQueueWrapper> queue)
+void GoingOutState::initializeAlexaQueue(shared_ptr<communication::MessageQueueWrapper> queue)
 {
     alexaQueue_ = queue;
 }

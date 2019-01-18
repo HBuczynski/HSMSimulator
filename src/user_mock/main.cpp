@@ -15,8 +15,7 @@ using namespace hsm;
 using namespace user;
 using namespace utility;
 
-shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue();
-shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue();
+shared_ptr<communication::MessageQueueWrapper> createMsgQueue(const string &name);
 
 int main()
 {
@@ -33,14 +32,15 @@ int main()
     logger.initLogger(struc);
 
 /* Define msg queues */
-    auto userQueue = createUserMsgQueue();
-    auto alexaQueue = createAlexaMsgQueue();
+    alexa::AlexaConfiguration configuration;
+    auto userQueue = createMsgQueue(configuration.userMsgQueueName);
+    auto alexaQueue = createMsgQueue(configuration.alexaMsgQueueName);
 
-    if(userQueue.get() == nullptr || alexaQueue.get() == nullptr)
+    if(userQueue == nullptr || alexaQueue == nullptr)
     {
         if(logger.isErrorEnable())
         {
-            const string message = string("User :: Did not create msg queues.");
+            const string message = string("Alexa :: Did not create msg queues.");
             logger.writeLog(LogType::ERROR_LOG, message);
         }
         return 0;
@@ -78,34 +78,14 @@ int main()
     return 0;
 }
 
-shared_ptr<communication::MessageQueueWrapper> createUserMsgQueue()
+shared_ptr<communication::MessageQueueWrapper> createMsgQueue(const string &name)
 {
-    shared_ptr<communication::MessageQueueWrapper> userQueue = nullptr;
-    alexa::AlexaConfiguration configuration;
     try
     {
-        userQueue = make_shared<communication::MessageQueueWrapper>(configuration.userMsgQueueName);
+        return make_shared<communication::MessageQueueWrapper>(name);
     }
     catch(boost::interprocess::interprocess_exception &ex)
     {
-        return userQueue;
+        return nullptr;
     }
-
-    return userQueue;
-}
-
-shared_ptr<communication::MessageQueueWrapper> createAlexaMsgQueue()
-{
-    shared_ptr<communication::MessageQueueWrapper> alexaQueue = nullptr;
-    alexa::AlexaConfiguration configuration;
-    try
-    {
-        alexaQueue = make_unique<communication::MessageQueueWrapper>(configuration.alexaMsgQueueName);
-    }
-    catch(boost::interprocess::interprocess_exception &ex)
-    {
-        return alexaQueue;
-    }
-
-    return alexaQueue;
 }
