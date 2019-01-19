@@ -34,7 +34,7 @@ In order to run State Machine and Alexa Simulator applications use `build_linux.
   * `./build_linux.sh AlexaSim` - to build Alexa Simulator</br>
      After building, go to `target/bin/` directory and run executable files in appropriate order:</br>
      Firstly: `./alexa_sim`</br>
-     Secondly: `./user`
+     Secondly: `./user_mock`
      
 ## Author
 Hubert Buczyński
