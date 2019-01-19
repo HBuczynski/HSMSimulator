@@ -27,7 +27,6 @@ namespace hsm
         virtual void runInitEvent() = 0;
 
         const std::string &getName() const noexcept;
-        const uint32_t &getID() const noexcept;
         std::shared_ptr<State> getParent() const noexcept;
 
         bool operator==(const State &rhs);
@@ -39,7 +38,6 @@ namespace hsm
 
         utility::Logger &logger_;
     private:
-        uint32_t id_;
         std::string name_;
         bool isCallbackInitialized;
 

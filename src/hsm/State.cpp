@@ -1,5 +1,4 @@
 #include "State.h"
-#include <utility/Utility.h>
 
 #include <cassert>
 
@@ -11,7 +10,6 @@ State::State(const string &name, shared_ptr<State> parent)
     : handleEvent_(nullptr),
       registerInternalState_(nullptr),
       logger_(Logger::getInstance()),
-      id_(Utility::getStateID()),
       name_(move(name)),
       isCallbackInitialized(false),
       parent_(parent)
@@ -38,7 +36,7 @@ void State::addTransition(Event event, shared_ptr<State> state)
     }
     
     // User tried to add the same transition.
-    if( (stateTable_[event].lock() != nullptr) && (stateTable_[event].lock()->getID() == state->getID()) )
+    if( (stateTable_[event].lock() != nullptr) && (stateTable_[event].lock()->getName() == state->getName()) )
     {
         if (logger_.isWarningEnable())
         {
@@ -77,11 +75,6 @@ const string &State::getName() const noexcept
     return name_;
 }
 
-const uint32_t &State::getID() const noexcept
-{
-    return id_;
-}
-
 shared_ptr<State> State::getParent() const noexcept
 {
     return parent_.lock();
@@ -89,7 +82,7 @@ shared_ptr<State> State::getParent() const noexcept
 
 bool State::operator==(const State &rhs)
 {
-    return id_ == rhs.id_;
+    return name_ == rhs.name_;
 }
 
 State &State::operator=(const State &rhs)
@@ -97,7 +90,6 @@ State &State::operator=(const State &rhs)
     parent_ = rhs.parent_;
     stateTable_ = rhs.stateTable_;
 
-    id_ = rhs.id_;
     name_ = rhs.name_;
 
     return *this;
