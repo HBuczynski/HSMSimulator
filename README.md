@@ -22,7 +22,7 @@ Make sure you have installed all of the following prerequisites on your developm
   * boost library
   
 ## Usage
-In order to run State Machine and Alexa Simulator applications use `build_on_linux.sh` as follow:
+In order to run State Machine and Alexa Simulator applications use `build_linux.sh` as follow:
   * `./build_linux.sh` - to show help:
   
 <p align="center">
